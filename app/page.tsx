@@ -3,7 +3,6 @@ import { Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
 const poppins = Poppins({ subsets: ["latin"], weight: ["600"] });
 
-// import { Button } from "@/components/ui/button";
 import { Button } from "@/components/ui/moving-border";
 import { LockIcon } from "lucide-react";
 import { LoginButton } from "@/components/ui/auth/login-button";
@@ -19,7 +18,6 @@ export default function Home() {
             poppins.className
           )}
         >
-          {/* <Fingerprint color="#38bdf8" size="40" className="inline mr-4" /> */}
           <LockIcon size="40" className="inline mr-4" />
           Auth
         </h1>
