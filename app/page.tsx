@@ -10,7 +10,7 @@ import { LoginButton } from "@/components/ui/auth/login-button";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center dark:bg-black bg-white dark:bg-dot-white/[0.30] bg-dot-black/[0.30] relative">
+    <main className="h-full flex items-center justify-center dark:bg-black bg-white dark:bg-dot-white/[0.30] bg-dot-black/[0.30] relative">
       <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-black bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
       <div className="space-y-6 text-center">
         <h1
