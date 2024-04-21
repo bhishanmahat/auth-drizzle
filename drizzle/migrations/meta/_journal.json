@@ -1,0 +1,34 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1713686825177,
+      "tag": "0000_sleepy_speedball",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1713716367069,
+      "tag": "0001_narrow_kronos",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1713716460304,
+      "tag": "0002_organic_magma",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1713716493758,
+      "tag": "0003_redundant_celestials",
+      "breakpoints": true
+    }
+  ]
+}
