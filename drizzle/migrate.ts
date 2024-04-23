@@ -3,7 +3,10 @@ import { drizzle } from "drizzle-orm/postgres-js";
 
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 
-import "dotenv/config";
+// import "dotenv/config";
+import * as dotenv from "dotenv"
+dotenv.config({path: ".env.local"})
+
 import * as schema from "./schema";
 
 const connectionString = process.env.DB_URL!;
@@ -13,7 +16,7 @@ if (!connectionString) {
 
 // for migrations
 const migrationClient = postgres(connectionString, { max: 1 });
-const migrationDb = drizzle(migrationClient, { schema });
+const migrationDb = drizzle(migrationClient, {logger: true});
 
 const main = async () => {
   try {
