@@ -10,7 +10,7 @@
     "db:generate": "drizzle-kit generate:pg --config=./drizzle.config.ts",
     "db:migrate": "tsx drizzle/migrate.ts",
     "studio": "drizzle-kit studio --config=./drizzle.config.ts",
-    "test": "tsx test.ts"
+    "db:test": "tsx drizzle/db.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.0.0",

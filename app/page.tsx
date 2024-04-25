@@ -5,7 +5,7 @@ const poppins = Poppins({ subsets: ["latin"], weight: ["600"] });
 
 import { Button } from "@/components/ui/moving-border";
 import { LockIcon } from "lucide-react";
-import { LoginButton } from "@/components/ui/auth/login-button";
+import { LoginButton } from "@/components/auth/login-button";
 
 export default function Home() {
   return (
@@ -26,7 +26,12 @@ export default function Home() {
         </p>
         <div>
           <LoginButton>
-            <Button containerClassName="h-12 w-32" className="text-lg font-medium">Sign In</Button>
+            <Button
+              containerClassName="h-12 w-32"
+              className="text-lg font-medium"
+            >
+              Sign In
+            </Button>
           </LoginButton>
         </div>
       </div>
