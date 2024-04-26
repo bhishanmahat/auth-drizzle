@@ -1,18 +1,16 @@
-import authConfig from "@/auth.config";
 import NextAuth from "next-auth";
+import { authConfig } from "@/auth.config";
+
 import {
   DEFAULT_LOGIN_REDIRECT,
   apiAuthPrefix,
-  publicRoutes,
   authRoutes,
-} from "./routes";
+  publicRoutes,
+} from "@/routes";
 
 const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
-  console.log("--ROUTE: ", req.nextUrl.pathname, "--");
-  // console.log("--IS LOGGEDIN: ", isLoggedIn, "--")
-
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
 
@@ -31,6 +29,7 @@ export default auth((req) => {
     return;
   }
 
+  // Problem: Redirects to Login Page after signing out but the URL does't update
   if (!isLoggedIn && !isPublicRoute) {
     return Response.redirect(new URL("/auth/login", nextUrl));
   }
