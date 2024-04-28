@@ -6,10 +6,14 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/drizzle/db";
 
 import Credentials from "next-auth/providers/credentials";
+import GitHub from "next-auth/providers/github";
+import Google from "next-auth/providers/google";
 import { LoginSchema } from "@/schemas/formSchema";
 import { getUserByEmail } from "./data/user";
 import { getUserById } from "./data/user";
 import bcrypt from "bcryptjs";
+import { eq } from "drizzle-orm";
+import { users } from "./drizzle/schema";
 
 declare module "next-auth/jwt" {
   interface JWT {
@@ -20,7 +24,7 @@ declare module "next-auth/jwt" {
 declare module "next-auth" {
   interface Session {
     user: {
-      id: string
+      id: string;
       role: "ADMIN" | "USER";
     } & DefaultSession["user"];
   }
@@ -28,6 +32,14 @@ declare module "next-auth" {
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
+  events: {
+    async linkAccount({ user }) {
+      await db
+        .update(users)
+        .set({ emailVerified: new Date() })
+        .where(eq(users.id, user.id!));
+    },
+  },
   callbacks: {
     async session({ token, session }) {
       console.log({ sessionToken: token });
@@ -56,6 +68,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   providers: [
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    }),
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
     Credentials({
       async authorize(credentails) {
         const parsedCredentials = LoginSchema.safeParse(credentails);
