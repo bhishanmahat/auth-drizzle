@@ -6,6 +6,7 @@ import {
   uuid,
   primaryKey,
   pgEnum,
+  unique,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "@auth/core/adapters";
 
@@ -44,5 +45,17 @@ export const accounts = pgTable(
     }),
   })
 );
+
+export const verificationTokens = pgTable(
+  "verificationToken",
+  {
+    id: uuid("id").defaultRandom().notNull().primaryKey(),
+    email: text("email"),
+    token: text("token").unique(),
+    expires: timestamp("expires")
+  }, (table) => ({
+    unq: unique().on(table.email, table.token)
+  })
+)
 
  

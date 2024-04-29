@@ -35,7 +35,7 @@ export const LoginForm = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | undefined>("");
-  // const [success, setSuccess] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -48,13 +48,12 @@ export const LoginForm = () => {
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
-    // setSuccess("");
+    setSuccess("");
 
     startTransition(() => {
       login(values).then((data) => {
-          setError(data?.error);
-        // TODO: Add when we add 2FA
-        // setSuccess(data.success);
+        setError(data?.error);
+        setSuccess(data?.success);
       });
     });
 
@@ -136,7 +135,7 @@ export const LoginForm = () => {
           </div>
 
           <FormError message={error || urlError} />
-          {/* <FormSuccess message={success} /> */}
+          <FormSuccess message={success} />
 
           <Button disabled={isPending} type="submit" className="w-full">
             Log in
