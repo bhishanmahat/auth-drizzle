@@ -58,4 +58,13 @@ export const verificationTokens = pgTable(
   })
 )
 
- 
+export const passwordResetTokens = pgTable(
+  "passwordResetToken", {
+    id: uuid("id").defaultRandom().notNull().primaryKey(),
+    email: text("email").notNull(),
+    token: text("token").notNull().unique(),
+    expires: timestamp("expires").notNull(),
+  }, (table) => ({
+    unq: unique().on(table.email, table.token)
+  })
+)
