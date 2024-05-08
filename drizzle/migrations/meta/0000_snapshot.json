@@ -1,5 +1,5 @@
 {
-  "id": "d9da359f-1d3b-402a-8378-ccca0f00fa6c",
+  "id": "6f78bb82-aa8c-4444-b3c0-73bad238e414",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -18,7 +18,7 @@
           "name": "type",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "provider": {
           "name": "provider",
@@ -102,6 +102,153 @@
       },
       "uniqueConstraints": {}
     },
+    "passwordResetToken": {
+      "name": "passwordResetToken",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires": {
+          "name": "expires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "passwordResetToken_token_unique": {
+          "name": "passwordResetToken_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "token"
+          ]
+        },
+        "passwordResetToken_email_token_unique": {
+          "name": "passwordResetToken_email_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email",
+            "token"
+          ]
+        }
+      }
+    },
+    "twoFactorConfirmation": {
+      "name": "twoFactorConfirmation",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "twoFactorConfirmation_userId_user_id_fk": {
+          "name": "twoFactorConfirmation_userId_user_id_fk",
+          "tableFrom": "twoFactorConfirmation",
+          "tableTo": "user",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "twoFactorConfirmation_userId_unique": {
+          "name": "twoFactorConfirmation_userId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "userId"
+          ]
+        }
+      }
+    },
+    "twoFactorToken": {
+      "name": "twoFactorToken",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires": {
+          "name": "expires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "twoFactorToken_token_unique": {
+          "name": "twoFactorToken_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "token"
+          ]
+        },
+        "twoFactorToken_email_token_unique": {
+          "name": "twoFactorToken_email_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email",
+            "token"
+          ]
+        }
+      }
+    },
     "user": {
       "name": "user",
       "schema": "",
@@ -149,6 +296,13 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'USER'"
+        },
+        "isTwoFactorEnabled": {
+          "name": "isTwoFactorEnabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         }
       },
       "indexes": {},
@@ -160,6 +314,57 @@
           "nullsNotDistinct": false,
           "columns": [
             "email"
+          ]
+        }
+      }
+    },
+    "verificationToken": {
+      "name": "verificationToken",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expires": {
+          "name": "expires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "verificationToken_token_unique": {
+          "name": "verificationToken_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "token"
+          ]
+        },
+        "verificationToken_email_token_unique": {
+          "name": "verificationToken_email_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email",
+            "token"
           ]
         }
       }
