@@ -7,8 +7,10 @@ import {
   primaryKey,
   pgEnum,
   unique,
+  boolean,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "@auth/core/adapters";
+import { relations } from "drizzle-orm";
 
 export const roleEnum = pgEnum("role", ["USER", "ADMIN"]);
 
@@ -20,7 +22,15 @@ export const users = pgTable("user", {
   image: text("image"),
   password: text("password"),
   role: roleEnum("role").default("USER"),
+  isTwoFactorEnabled: boolean("isTwoFactorEnabled").default(false),
 });
+
+export const usersRelations = relations(users, ({one}) => ({
+  twoFactorConfirmation: one(twoFactorConfirmations, {
+    fields:[users.id],
+    references: [twoFactorConfirmations.userId]
+  })
+}))
 
 export const accounts = pgTable(
   "account",
@@ -67,4 +77,22 @@ export const passwordResetTokens = pgTable(
   }, (table) => ({
     unq: unique().on(table.email, table.token)
   })
+)
+
+export const twoFactorTokens = pgTable(
+  "twoFactorToken", {
+    id: uuid("id").defaultRandom().notNull().primaryKey(),
+    email: text("email").notNull(),
+    token: text("token").notNull().unique(),
+    expires: timestamp("expires").notNull(),
+  }, (table) => ({
+    unq: unique().on(table.email, table.token)
+  })
+)
+
+export const twoFactorConfirmations = pgTable(
+  "twoFactorConfirmation", {
+    id: uuid("id").defaultRandom().notNull().primaryKey(),
+    userId: uuid("userId").notNull().references(() => users.id, {onDelete: "cascade"}).unique()
+  }
 )

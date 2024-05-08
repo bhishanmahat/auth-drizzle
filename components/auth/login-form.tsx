@@ -15,6 +15,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,14 @@ import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { login } from "@/actions/login";
 
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
+
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
+
 export const LoginForm = () => {
   const searchParams = useSearchParams();
   const urlError =
@@ -33,6 +42,7 @@ export const LoginForm = () => {
       ? "Email already in use with different provider!"
       : "";
 
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -51,13 +61,24 @@ export const LoginForm = () => {
     setSuccess("");
 
     startTransition(() => {
-      login(values).then((data) => {
-        setError(data?.error);
-        setSuccess(data?.success);
-      });
-    });
+      login(values)
+        .then((data) => {
+          if (data?.error) {
+            form.reset();
+            setError(data.error);
+          }
 
-    form.reset();
+          if (data?.success) {
+            form.reset();
+            setSuccess(data.success);
+          }
+
+          if (data?.twoFactor) {
+            setShowTwoFactor(true);
+          }
+        })
+        .catch(() => setError("Something went wrong!"));
+    });
   };
 
   return (
@@ -71,74 +92,113 @@ export const LoginForm = () => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Email"
-                      disabled={isPending}
-                      type="email"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Password"
-                      disabled={isPending}
-                      type={showPassword ? "text" : "password"}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <Button
-              variant="link"
-              size="sm"
-              className="h-4 px-0 font-normal text-sm"
-              asChild
-            >
-              <Link href="/auth/reset">Forgot password?</Link>
-            </Button>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="togglepwd"
-                onCheckedChange={() => {
-                  setShowPassword(!showPassword);
-                }}
+            {showTwoFactor && (
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Enter 2FA Code"
+                        disabled={isPending}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <label
-                htmlFor="togglepwd"
-                className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Show password
-              </label>
-            </div>
+            )}
+
+            {/* {showTwoFactor && (
+              <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS_AND_CHARS}>
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+        
+            )} */}
+
+            {!showTwoFactor && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Email"
+                          disabled={isPending}
+                          type="email"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Password"
+                          disabled={isPending}
+                          type={showPassword ? "text" : "password"}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
           </div>
+
+          {!showTwoFactor && (
+            <div className="flex items-center justify-between">
+              <Button
+                variant="link"
+                size="sm"
+                className="h-4 px-0 font-normal text-sm"
+                asChild
+              >
+                <Link href="/auth/reset">Forgot password?</Link>
+              </Button>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="togglepwd"
+                  onCheckedChange={() => {
+                    setShowPassword(!showPassword);
+                  }}
+                />
+                <label
+                  htmlFor="togglepwd"
+                  className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Show password
+                </label>
+              </div>
+            </div>
+          )}
 
           <FormError message={error || urlError} />
           <FormSuccess message={success} />
 
           <Button disabled={isPending} type="submit" className="w-full">
-            Log in
+            {showTwoFactor ? "Confirm" : "Log in"}
           </Button>
         </form>
       </Form>

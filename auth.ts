@@ -13,7 +13,8 @@ import { getUserByEmail } from "./data/user";
 import { getUserById } from "./data/user";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
-import { users } from "./drizzle/schema";
+import { twoFactorConfirmations, users } from "./drizzle/schema";
+import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
 
 declare module "next-auth/jwt" {
   interface JWT {
@@ -41,8 +42,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   callbacks: {
-    async signIn({user, account}) {
-      
+    async signIn({ user, account }) {
       // Allow OAuth without email verification
       if (account?.provider !== "credentials") return true;
 
@@ -51,7 +51,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Prevent sign in without email verification
       if (!existingUser?.emailVerified) return false;
 
-      //TODO: 2FA check
+      if (existingUser.isTwoFactorEnabled) {
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+          existingUser.id
+        );
+
+        if (!twoFactorConfirmation) return false;
+
+        // Delete two factor confirmation for next sign in
+        await db
+          .delete(twoFactorConfirmations)
+          .where(eq(twoFactorConfirmations.id, twoFactorConfirmation.id));
+      }
 
       return true;
     },
